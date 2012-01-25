@@ -1,0 +1,5 @@
+<resources>
+    <color name="event_divider">#ffcccccc</color>
+    <color name="system_green">#ff669900</color>
+    <color name="system_blue">#ff0099cc</color>
+</resources>

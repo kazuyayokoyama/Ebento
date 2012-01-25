@@ -1,0 +1,4 @@
+<resources>
+    <!-- UI elements -->
+    <dimen name="rsvp_height">100dip</dimen>
+</resources>

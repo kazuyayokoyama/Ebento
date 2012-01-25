@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <!-- Label -->
+    <string name="app_name">Ebento</string>
+    <string name="label_event">Ebento</string>
+    <string name="label_people_list">Ebento / Who\'s going?</string>
+    <string name="label_create_event">Ebento / Create Event</string>
+    <string name="label_edit_event">Ebento / Edit Event</string>
+    <string name="label_camera">Camera</string>
+    <string name="label_gallery">Gallery</string>
+    <string name="label_remove_picture">Remove</string>
+    
+    <!-- Menu -->
+    <string name="menu_edit_save">Save</string>
+    <string name="menu_event_people">Who\'s going?</string>
+    <string name="menu_event_edit">Edit</string>
+    <string name="menu_event_calendar">Calendar</string>
+    
+    <!-- Dialog -->
+    <string name="market_dialog_title">Thank you for using Ebento!</string>
+    <string name="market_dialog_text">If you want to use Ebento, please download Musubi first and launch Ebento again on Musubi.\nDownload Musubi now?</string>
+    <string name="market_dialog_yes">Sure!</string>
+    <string name="market_dialog_no">No, thanks</string>
+    <string name="musubi_dialog_title">Thank you for using Ebento!</string>
+    <string name="musubi_dialog_text">If you want to use Ebento, please launch it on Musubi.\nLaunch Musubi now?</string>
+    <string name="musubi_dialog_yes">Sure!</string>
+    <string name="musubi_dialog_no">No, thanks</string>
+    <string name="check_dialog_title">Oops!</string>
+    <string name="check_dialog_text">Please input the requred items.</string>
+    <string name="check_dialog_ok">OK</string>
+    <string name="add_cal_dialog_title">Calendar</string>
+    <string name="add_cal_dialog_text">Do you want to add this event to your calendar?</string>
+    <string name="add_cal_dialog_yes">Sure!</string>
+    <string name="add_cal_dialog_no">No, thanks</string>
+    
+    <!-- Event -->
+    <string name="event_title_dummy">TGIF CS</string>
+    <string name="event_details_dummy">All people can drink beers and eat snacks.</string>
+    <string name="event_date_dummy">Saturday, January 21, 2012</string>
+    <string name="event_time_dummy">5:00 PM&#8211;7:00 PM</string>
+    <string name="event_place_dummy">Gates Bldg. at Stanford University</string>
+    <string name="event_organizer_dummy">Kaz</string>
+    <string name="event_people_yes_dummy">14</string>
+    <string name="event_people_maybe_dummy">10</string>
+    <string name="event_people_no_dummy">12</string>
+    
+    <string name="event_img_description">Image of the event</string>
+    <string name="event_time_to"> &#8211;</string>
+    <string name="event_place_at">\u0040</string>
+    <string name="event_organizer_by">by</string>
+    <string name="event_organizer_you"> (You)</string>
+    <string name="event_people_yes_is">Yes: </string>
+    <string name="event_people_maybe_is">Maybe: </string>
+    <string name="event_people_no_is">No: </string>
+    
+    <!-- People -->
+    <string name="people_img_description">Image of People</string>
+    <string name="people_yes_header">Yes (<xliff:g id="count">%1$s</xliff:g>)</string>
+    <string name="people_maybe_header">Maybe (<xliff:g id="count">%1$s</xliff:g>)</string>
+    <string name="people_no_header">No (<xliff:g id="count">%1$s</xliff:g>)</string>
+    <string name="people_you"> (You)</string>
+    
+    <!-- Edit Event -->
+    <string name="edit_event_title">What</string>
+    <string name="edit_event_title_hint">Event title</string>
+    <string name="edit_event_date">Date</string>
+    <string name="edit_event_date_time">When</string>
+    <string name="edit_event_date_time_from">From</string>
+    <string name="edit_event_date_time_to">To</string>
+    <string name="edit_event_date_button">Pickup Date</string>
+    <string name="edit_event_start_time">Start Time</string>
+    <string name="edit_event_end_time">End Time(if any)</string>
+    <string name="edit_event_start_to_end"> &#8211; </string>
+    <string name="edit_event_place">Where</string>
+    <string name="edit_event_place_hint">Event location</string>
+    <string name="edit_event_details">Detail (if any)</string>
+    <string name="edit_event_details_hint">Event detail</string>
+    <string name="edit_event_image">Picture (if any)</string>
+    <string name="edit_event_image_button">Pickup Picture</string>
+    <string name="edit_event_image_description">Image of the event</string>
+    
+    <!-- RSVP -->
+    <string name="rsvp_title">RSVP now!</string>
+    <string name="rsvp_yes">Yes</string>
+    <string name="rsvp_no">No</string>
+    <string name="rsvp_maybe">Maybe</string>
+    
+    <!-- Musubi Feed / Message -->
+    <string name="feed_msg_event_created">New Event! Check it out!</string>
+    <string name="feed_msg_event_updated">Updated! Stay tuned.</string>
+    <string name="feed_msg_yes">Yay! <xliff:g id="name">%1$s</xliff:g> is going!</string>
+    <string name="feed_msg_maybe"><xliff:g id="name">%1$s</xliff:g> is thinking.</string>
+    <string name="feed_msg_no">Hmm, <xliff:g id="name">%1$s</xliff:g> declined.</string>
+    
+    <!-- Toast -->
+    <string name="toast_calendar_added_success">Great!\nThe Event is added to your calendar.</string>
+    <string name="toast_calendar_added_failure">Sorry.\nThe Event is not added.</string>
+    
+</resources>

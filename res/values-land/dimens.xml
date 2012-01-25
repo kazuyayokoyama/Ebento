@@ -1,0 +1,6 @@
+<resources>
+
+    <!-- UI elements -->
+    <dimen name="rsvp_width">150dip</dimen>
+
+</resources>
