@@ -35,7 +35,7 @@ import com.kazuyayokoyama.android.apps.ebento.io.EventManager;
 public class HomeActivity extends FragmentActivity {
 	//private static final String TAG = "HomeActivity";
 	private static final int REQUEST_EVENT = 0;
-	private static final int REQUEST_EDIT = 1;
+	private static final int REQUEST_EVENT_LIST = 1;
 	
 	private EventManager mManager = EventManager.getInstance();
 	private Musubi mMusubi = null;
@@ -84,22 +84,23 @@ public class HomeActivity extends FragmentActivity {
 			if (mManager.hasEvent()) {
 				goEvent();
 			} else {
-				goCreate();
+				goList();
 			}
 		}
     }
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == REQUEST_EDIT) {
-			// New Event Saved
+		if (requestCode == REQUEST_EVENT) {
+			mManager.fin();
+			finish();
+		} else if (requestCode == REQUEST_EVENT_LIST) {
 			if (resultCode == Activity.RESULT_OK) {
 				goEvent();
 			} else {
+				mManager.fin();
 				finish();
 			}
-		} else if (requestCode == REQUEST_EVENT) {
-			finish();
 		}
 	}
     
@@ -109,10 +110,10 @@ public class HomeActivity extends FragmentActivity {
 		startActivityForResult(intent, REQUEST_EVENT);
     }
     
-    public void goCreate() {
+    public void goList() {
 		// Intent
-		Intent intent = new Intent(this, EditActivity.class);
-		startActivityForResult(intent, REQUEST_EDIT);
+		Intent intent = new Intent(this, EventListActivity.class);
+		startActivityForResult(intent, REQUEST_EVENT_LIST);
     }
     
 	public void goMarket() {

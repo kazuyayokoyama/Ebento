@@ -92,7 +92,7 @@ public class EventFragment extends Fragment {
         if (event.image == null) {
 	        mEventImage.setImageBitmap(
 	        		BitmapHelper.getResizedBitmap(
-	        				BitmapFactory.decodeResource(getResources(), R.drawable.default_image), 
+	        				BitmapFactory.decodeResource(getResources(), R.drawable.default_image_event), 
 	        				mTargetWidth, mTargetHeight, 0));
         } else {
         	mEventImage.setImageBitmap(

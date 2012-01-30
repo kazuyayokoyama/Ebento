@@ -39,6 +39,7 @@ import android.os.Handler;
 import android.util.Base64;
 import android.util.Log;
 
+import com.kazuyayokoyama.android.apps.ebento.ui.EventListItem;
 import com.kazuyayokoyama.android.apps.ebento.ui.PeopleListItem;
 import com.kazuyayokoyama.android.apps.ebento.util.BitmapHelper;
 
@@ -46,8 +47,12 @@ public class EventManager {
     public interface OnStateUpdatedListener {
         public void onStateUpdated();
     }
-    
+
+    public static final String ANDROID_PACKAGE_NAME = "android_pkg";
+    public static final String ANDROID_CLASS_NAME = "android_cls";
+    public static final String ANDROID_ACTION = "android_action";
 	public static final String TYPE_APP_STATE = "appstate";
+	public static final String TYPE_APP = "app";
 	
 	// root > state
 	public static final String STATE = "state";
@@ -93,6 +98,7 @@ public class EventManager {
     private int mVersionCode = 0;
 	
 	private Event mEvent = null;
+	private ArrayList<EventListItem> mEventList = new ArrayList<EventListItem>();
 	private ArrayList<PeopleListItem> mPeopleList = null;
     private ArrayList<OnStateUpdatedListener> mListenerList = new ArrayList<OnStateUpdatedListener>();
 
@@ -114,37 +120,15 @@ public class EventManager {
 	public void init(Musubi musubi, Uri baseUri, int versionCode) {
 		// Musubi
 		mMusubi = musubi;
-		mDbFeed = mMusubi.getObj().getSubfeed();
 		mBaseUri = baseUri;
 		mLocalContactId = mMusubi.userForLocalDevice(mBaseUri).getId();
 		mLocalName = mMusubi.userForLocalDevice(mBaseUri).getName();
 		mVersionCode = versionCode;
-
-        String[] projection = null;
-        String selection = "type = ?";
-        String[] selectionArgs = new String[] { TYPE_APP_STATE };
-        String sortOrder = DbObj.COL_KEY_INT + " desc";
-        mDbFeed.setQueryArgs(projection, selection, selectionArgs, sortOrder);
-        
-        mDbFeed.registerStateObserver(mStateObserver);
-
-		// json
-		JSONObject stateObj = null;
-		Obj obj = mDbFeed.getLatestObj();
-		if (obj != null && obj.getJson() != null && obj.getJson().has(STATE)) {
-			stateObj = obj.getJson().optJSONObject(STATE);
-		}
-
-		if (stateObj == null) {
-			initData();
-			mLastInt = 0;
-		} else {
-			setNewStateObj(stateObj);
-			mLastInt = (obj.getInt() == null) ? 0 : obj.getInt();
-		}
+		setDbFeed(mMusubi.getObj().getSubfeed());
 	}
 
 	public void fin() {
+        mDbFeed.removeStateObserver(mStateObserver);
 		initData();
 
 		if (sInstance != null) {
@@ -171,15 +155,15 @@ public class EventManager {
 		return mPeopleList.size();
 	}
 
-	public String getLocalContactId() {
+	synchronized public String getLocalContactId() {
 		return mLocalContactId;
 	}
 
-	public String getLocalName() {
+	synchronized public String getLocalName() {
 		return mLocalName;
 	}
 	
-	public int getLocalState() {
+	synchronized public int getLocalState() {
 		int state = People.STATE_UNKNOWN;
 		if (mPeopleList != null) {
 			for (int i=0; i<mPeopleList.size(); i++) {
@@ -199,7 +183,7 @@ public class EventManager {
 		return state;
 	}
 	
-	public int getNumberOfState(int state) {
+	synchronized public int getNumberOfState(int state) {
 		int number = 0;
 		for (int i=0; i<mPeopleList.size(); i++) {
 			PeopleListItem item = mPeopleList.get(i);
@@ -211,7 +195,7 @@ public class EventManager {
 		return number;
 	}
 	
-	public boolean isCreator() {
+	synchronized public boolean isCreator() {
 		boolean ret = true;
 		if (mEvent != null) {
 			ret = mLocalContactId.equals(mEvent.creContactId);
@@ -219,10 +203,53 @@ public class EventManager {
 		return ret;
 	}
 
+	// Event List
+	synchronized public void loadEventList() {
+        String[] projection = null;
+        String selection = "type = ? AND feed_name = ?";
+        String[] selectionArgs = new String[] { TYPE_APP, mMusubi.getObj().getFeedName() };
+        String sortOrder = null;
+        
+		Cursor c = mMusubi.getAppFeed().query(projection, selection, selectionArgs, sortOrder);
+
+		if (c != null && c.moveToFirst()) {
+			mEventList = new ArrayList<EventListItem>();
+			
+			for (int i = 0; i < c.getCount(); i++) {
+				EventListItem item = new EventListItem();
+				item.event = new Event();
+				
+				DbObj dbObj = mMusubi.objForCursor(c);
+				DbFeed dbFeed = dbObj.getSubfeed();
+				Obj latestObj = dbFeed.getLatestObj();
+				if (latestObj != null && latestObj.getJson() != null && latestObj.getJson().has(STATE)) {
+					JSONObject stateObj = latestObj.getJson().optJSONObject(STATE);
+					if (fetchEventObj(dbFeed, stateObj, item.event)) {
+						item.feedUri = dbFeed.getUri();
+						mEventList.add(0, item);
+					}
+				}
+				c.moveToNext();
+			}
+		}
+		c.close();
+	}
+	
+	synchronized public EventListItem getEventListItem(int position) {
+		return mEventList.get(position);
+	}
+
+	synchronized public int getEventListCount() {
+		return mEventList.size();
+	}
+
 	// ----------------------------------------------------------
 	// Update
 	// ----------------------------------------------------------
 	synchronized public void createEvent(Event event, String htmlMsg) {
+		//if (!isEmptyDbFeed(mDbFeed)) {
+		//	setNewDbFeed();
+		//}
 		newData();
 		updateEvent(event, htmlMsg);
 	}
@@ -288,10 +315,92 @@ public class EventManager {
 			Log.e(TAG, "Failed to post JSON", e);
 		}
 	}
+
+	public void setDbFeed(Uri feedUri) {
+		setDbFeed(mMusubi.getFeed(feedUri));
+	}
+	
+	public void setDbFeed(DbFeed dbFeed) {
+		// previous feed
+		if (mDbFeed != null) {
+			mDbFeed.removeStateObserver(mStateObserver);
+		}
+        
+        // new feed
+		mDbFeed = dbFeed;
+
+        String[] projection = null;
+        String selection = "type = ?";
+        String[] selectionArgs = new String[] { TYPE_APP_STATE };
+        String sortOrder = DbObj.COL_KEY_INT + " desc";
+        mDbFeed.setQueryArgs(projection, selection, selectionArgs, sortOrder);
+        
+        mDbFeed.registerStateObserver(mStateObserver);
+
+		// json
+		JSONObject stateObj = null;
+		Obj obj = mDbFeed.getLatestObj();
+		if (obj != null && obj.getJson() != null && obj.getJson().has(STATE)) {
+			stateObj = obj.getJson().optJSONObject(STATE);
+		}
+
+		if (stateObj == null) {
+			initData();
+			mLastInt = 0;
+		} else {
+			setNewStateObj(stateObj);
+			mLastInt = (obj.getInt() == null) ? 0 : obj.getInt();
+		}
+	}
+
+    @Deprecated
+	public void setNewDbFeed() {
+		// post new app object
+		DbFeed feed = mMusubi.getFeed();
+        JSONObject json = new JSONObject();
+        try {
+            json.put(ANDROID_ACTION, "mobisocial.intent.action.CONNECTED");
+            json.put(ANDROID_PACKAGE_NAME, "com.kazuyayokoyama.android.apps.ebento");
+            json.put(ANDROID_CLASS_NAME, "com.kazuyayokoyama.android.apps.ebento.ui.HomeActivity");
+        } catch (JSONException e) {
+            Log.d(TAG, "Failed to put JSON", e);
+        }
+		feed.postObj(new MemObj(TYPE_APP, json));
+		
+		// search posted object
+        String[] projection = null;
+        String selection = "type = ? AND feed_name = ?";
+        String[] selectionArgs = new String[] { TYPE_APP, mMusubi.getObj().getFeedName() };
+        String sortOrder = null;
+        
+		Cursor c = mMusubi.getAppFeed().query(projection, selection, selectionArgs, sortOrder);
+		// go to last
+		if (c != null && c.moveToLast()) {
+			DbObj dbObj = mMusubi.objForCursor(c);
+			DbFeed dbFeed = dbObj.getSubfeed();
+			// TODO : confirm if the dbFeed is the one created right now
+			setDbFeed(dbFeed);
+		}
+		c.close();
+	}
+
+    @Deprecated
+	public boolean isEmptyDbFeed(DbFeed dbFeed) {
+		boolean isEmpty = true;
+
+		Obj latestObj = dbFeed.getLatestObj();
+		if (latestObj != null && latestObj.getJson() != null && latestObj.getJson().has(STATE)) {
+			isEmpty = false;
+		} else {
+			isEmpty = true;
+		}
+		
+		return isEmpty;
+	}
 	
 	private final FeedObserver mStateObserver = new FeedObserver() {
 		@Override
-		public void onUpdate(DbObj obj) {
+		synchronized public void onUpdate(DbObj obj) {
 
 			mLastInt = (obj.getInt() == null) ? 0 : obj.getInt();
 			
@@ -302,6 +411,16 @@ public class EventManager {
 				try {
 					// TODO : just in case
 					if (! isValidEvent(stateObj.getJSONObject(EVENT).optString(EVENT_UUID))) {
+
+						Handler handler = new Handler();
+						handler.post(new Runnable(){
+							public void run(){
+								for (OnStateUpdatedListener listener : mListenerList) {
+									listener.onStateUpdated();
+								}
+							}
+						});
+						
 						return;
 					}
 				} catch (JSONException e) {
@@ -326,7 +445,7 @@ public class EventManager {
 	};
 
 	// ----------------------------------------------------------
-	// Utility
+	// Private
 	// ----------------------------------------------------------
 	private void initData() {
 		mEvent = null;
@@ -349,49 +468,58 @@ public class EventManager {
 	}
 	
 	private void setNewEventObj(JSONObject stateObj) {
+		fetchEventObj(mDbFeed, stateObj, mEvent);
+	}
+	
+	private boolean fetchEventObj(DbFeed dbFeed, JSONObject stateObj, Event event) {
+		boolean ret = false;
 		try {
 			JSONObject eventObj = stateObj.getJSONObject(EVENT);
-			mEvent.uuid = eventObj.optString(EVENT_UUID);
-			mEvent.title = eventObj.optString(EVENT_TITLE);
-			mEvent.place = eventObj.optString(EVENT_PLACE);
-			mEvent.details = eventObj.optString(EVENT_DETAILS);
+			event.uuid = eventObj.optString(EVENT_UUID);
+			event.title = eventObj.optString(EVENT_TITLE);
+			event.place = eventObj.optString(EVENT_PLACE);
+			event.details = eventObj.optString(EVENT_DETAILS);
 			
 			JSONObject startDateObj = eventObj.getJSONObject(EVENT_DATE_START);
-			mEvent.startDate.year = startDateObj.optInt(EVENT_DATE_YEAR);
-			mEvent.startDate.month = startDateObj.optInt(EVENT_DATE_MONTH);
-			mEvent.startDate.day = startDateObj.optInt(EVENT_DATE_DAY);
-			mEvent.startDate.bAllDay = startDateObj.optBoolean(EVENT_DATE_ALLDAY);
+			event.startDate.year = startDateObj.optInt(EVENT_DATE_YEAR);
+			event.startDate.month = startDateObj.optInt(EVENT_DATE_MONTH);
+			event.startDate.day = startDateObj.optInt(EVENT_DATE_DAY);
+			event.startDate.bAllDay = startDateObj.optBoolean(EVENT_DATE_ALLDAY);
 			
 			JSONObject endDateObj = eventObj.getJSONObject(EVENT_DATE_END);
-			mEvent.endDate.year = endDateObj.optInt(EVENT_DATE_YEAR);
-			mEvent.endDate.month = endDateObj.optInt(EVENT_DATE_MONTH);
-			mEvent.endDate.day = endDateObj.optInt(EVENT_DATE_DAY);
-			mEvent.endDate.bAllDay = endDateObj.optBoolean(EVENT_DATE_ALLDAY);
+			event.endDate.year = endDateObj.optInt(EVENT_DATE_YEAR);
+			event.endDate.month = endDateObj.optInt(EVENT_DATE_MONTH);
+			event.endDate.day = endDateObj.optInt(EVENT_DATE_DAY);
+			event.endDate.bAllDay = endDateObj.optBoolean(EVENT_DATE_ALLDAY);
 
 			JSONObject startTimeObj = eventObj.getJSONObject(EVENT_TIME_START);
-			mEvent.startTime.hour = startTimeObj.optInt(EVENT_TIME_HOUR);
-			mEvent.startTime.minute = startTimeObj.optInt(EVENT_TIME_MINUTE);
+			event.startTime.hour = startTimeObj.optInt(EVENT_TIME_HOUR);
+			event.startTime.minute = startTimeObj.optInt(EVENT_TIME_MINUTE);
 
 			JSONObject endTimeObj = eventObj.getJSONObject(EVENT_TIME_END);
-			mEvent.endTime.hour = endTimeObj.optInt(EVENT_TIME_HOUR);
-			mEvent.endTime.minute = endTimeObj.optInt(EVENT_TIME_MINUTE);
+			event.endTime.hour = endTimeObj.optInt(EVENT_TIME_HOUR);
+			event.endTime.minute = endTimeObj.optInt(EVENT_TIME_MINUTE);
 			
-			mEvent.creDateMillis = eventObj.optLong(EVENT_CRE_DATE);
-			mEvent.modDateMillis = eventObj.optLong(EVENT_MOD_DATE);
-			mEvent.creContactId = eventObj.optString(EVENT_CRE_CONTACT_ID);
-			mEvent.modContactId = eventObj.optString(EVENT_MOD_CONTACT_ID);
-			DbUser dbUser = mDbFeed.userForGlobalId(mEvent.creContactId);	
-			mEvent.creatorName = (dbUser != null ? dbUser.getName() : "");
+			event.creDateMillis = eventObj.optLong(EVENT_CRE_DATE);
+			event.modDateMillis = eventObj.optLong(EVENT_MOD_DATE);
+			event.creContactId = eventObj.optString(EVENT_CRE_CONTACT_ID);
+			event.modContactId = eventObj.optString(EVENT_MOD_CONTACT_ID);
+			DbUser dbUser = mDbFeed.userForGlobalId(event.creContactId);	
+			event.creatorName = (dbUser != null ? dbUser.getName() : "");
 			
 			boolean bImage = eventObj.optBoolean(EVENT_HAS_IMAGE);
 			if (bImage) {
-				mEvent.image = getEventImage(mEvent.uuid);
+				event.image = getEventImage(dbFeed, event.uuid);
 			} else {
-				mEvent.image = null;
+				event.image = null;
 			}
+			
+			ret = true;
 		} catch (JSONException e) {
 			Log.e(TAG, "Failed to get JSON", e);
 		}
+		
+		return ret;
 	}
 
 	private void setNewPeopleListObj(JSONObject stateObj) {
@@ -469,13 +597,13 @@ public class EventManager {
 		}
 	}
 
-	private Bitmap getEventImage(String eventUuid) {
+	private Bitmap getEventImage(DbFeed dbFeed, String eventUuid) {
 		Bitmap bitmap = null;
 		int targetWidth = BitmapHelper.MAX_IMAGE_WIDTH;
 		int targetHeight = BitmapHelper.MAX_IMAGE_HEIGHT;
 		float degrees = 0;
 
-		Cursor c = mDbFeed.query();
+		Cursor c = dbFeed.query();
 		c.moveToFirst();
 		for (int i = 0; i < c.getCount(); i++) {
 			Obj object = mMusubi.objForCursor(c);
@@ -591,4 +719,5 @@ public class EventManager {
 	private boolean isValidEvent(String uuid) {
 		return (mEvent != null && mEvent.uuid != null && uuid != null && mEvent.uuid.equals(uuid));
 	}
+
 }

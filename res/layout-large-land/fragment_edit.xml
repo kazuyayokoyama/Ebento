@@ -155,7 +155,7 @@
 		    android:adjustViewBounds="true"
 		    android:layout_marginTop="3dip"
 			android:layout_gravity="left"
-			android:src="@drawable/default_image"
+			android:src="@drawable/default_image_event"
 			android:contentDescription="@string/edit_event_image_description"  />
 			
 	</LinearLayout>

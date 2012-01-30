@@ -14,15 +14,16 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/menu_event_list"
-        android:icon="@drawable/ic_menu_show_list"
-        android:title="@string/menu_event_list"
-        android:orderInCategory="1"
-        android:showAsAction="always" />
-    <item android:id="@+id/menu_calendar"
-        android:icon="@drawable/ic_menu_my_calendar"
-        android:title="@string/menu_event_calendar"
-        android:orderInCategory="2"
-        android:showAsAction="always" />
-</menu>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root_container"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <fragment android:name="com.kazuyayokoyama.android.apps.ebento.ui.EventListFragment"
+        android:id="@+id/fragment_event_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
+        
+</LinearLayout>

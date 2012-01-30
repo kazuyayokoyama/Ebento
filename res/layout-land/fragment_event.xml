@@ -47,7 +47,7 @@
 		        android:adjustViewBounds="true"
 		        android:layout_marginTop="10dip"
 			    android:layout_gravity="center"
-			    android:src="@drawable/default_image"
+			    android:src="@drawable/default_image_event"
 			    android:contentDescription="@string/event_img_description"  />
 		    
 		    <!-- Title -->

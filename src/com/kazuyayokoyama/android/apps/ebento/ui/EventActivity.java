@@ -17,12 +17,15 @@
 package com.kazuyayokoyama.android.apps.ebento.ui;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.support.v4.app.ActionBar;
@@ -31,6 +34,11 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.view.Menu;
 import android.support.v4.view.MenuItem;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.kazuyayokoyama.android.apps.ebento.R;
@@ -47,6 +55,7 @@ public class EventActivity extends FragmentActivity implements OnRsvpSelectedLis
 	private static final int REQUEST_EDIT = 1;
     private EventManager mManager = EventManager.getInstance();
     private EventFragment mEventFragment;
+    private RsvpFragment mRsvpFragment;
     private PeopleListFragment mPeopleListFragment;
 	
     @Override
@@ -58,9 +67,11 @@ public class EventActivity extends FragmentActivity implements OnRsvpSelectedLis
 		// set defaults for logo & home up
 		actionBar.setDisplayHomeAsUpEnabled(false);
 		actionBar.setDisplayUseLogoEnabled(false);
+		actionBar.setDisplayShowTitleEnabled(false);
 
 		FragmentManager fm = getSupportFragmentManager();
 		mEventFragment = (EventFragment) fm.findFragmentById(R.id.fragment_event);
+		mRsvpFragment = (RsvpFragment) fm.findFragmentById(R.id.fragment_rsvp);
 		mPeopleListFragment = (PeopleListFragment) fm.findFragmentById(R.id.fragment_people_list);
 		mManager.addListener(mStateUpdatedListener);
     }
@@ -94,6 +105,9 @@ public class EventActivity extends FragmentActivity implements OnRsvpSelectedLis
 		} else if (item.getItemId() == R.id.menu_calendar) {
 			goCalendar();
 			return true;
+		} else if (item.getItemId() == R.id.menu_event_list) {
+			goEventList();
+			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -106,18 +120,23 @@ public class EventActivity extends FragmentActivity implements OnRsvpSelectedLis
 	// RsvpFragment > OnRsvpSelectedListener
 	@Override
 	public void onRsvpSelected(int state) {
-		mEventFragment.refreshView();
-		if (mPeopleListFragment != null) mPeopleListFragment.refreshView();
+		refreshFragmentView();
 	}
 	
 	// EventManager > OnStateUpdatedListener
 	private OnStateUpdatedListener mStateUpdatedListener = new OnStateUpdatedListener() {
 		@Override
 		public void onStateUpdated() {
-			mEventFragment.refreshView();
-			if (mPeopleListFragment != null) mPeopleListFragment.refreshView();
+			refreshFragmentView();
 		}
 	};
+	
+	private void refreshFragmentView() {
+		this.invalidateOptionsMenu();
+		mEventFragment.refreshView();
+		mRsvpFragment.refreshView();
+		if (mPeopleListFragment != null) mPeopleListFragment.refreshView();
+	}
 	
 	private void goPeople() {
 		// Intent
@@ -216,5 +235,97 @@ public class EventActivity extends FragmentActivity implements OnRsvpSelectedLis
         	}
         	cursor.close();
         }
+	}
+	
+	private void goEventList() {
+
+		// Load Event List
+		EventListDialogAsyncTask task = new EventListDialogAsyncTask(this);
+		task.execute();
+	}
+	
+	class EventListDialogAsyncTask extends AsyncTask<Void, Void, Boolean> {
+		private EventManager mManager = EventManager.getInstance();
+		private Context mContext;
+		private AlertDialog mEventListDialog = null;
+		private ProgressDialog mProgressDialog = null;
+		
+		public EventListDialogAsyncTask(Context context) {
+			mContext = context;
+		}
+
+		@Override
+		protected void onPreExecute() {
+			LayoutInflater inflater = (LayoutInflater)mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+	        final View listRoot = inflater.inflate(R.layout.fragment_event_list, null, false);
+	        
+	        // Dialog
+			AlertDialog.Builder eventListDialogBuilder = new AlertDialog.Builder(mContext)
+			.setTitle(R.string.event_list_dialog_title)
+			.setView(listRoot)
+			.setCancelable(true)
+			.setNegativeButton(getResources().getString(R.string.event_list_dialog_cancel),
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {
+							// nothing to do
+						}
+					});
+
+	        // ListView
+			final ListView listView = (ListView) listRoot.findViewById(android.R.id.list);
+	        listView.setFastScrollEnabled(true);
+	        
+	        // Create adapter
+	        final EventListItemAdapter listAdapter = new EventListItemAdapter(
+	        		mContext, 
+	        		android.R.layout.simple_list_item_1,
+	        		listView);
+			listView.setAdapter(listAdapter);
+			
+			mEventListDialog = eventListDialogBuilder.create();
+			
+			listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+					EventListItem item = mManager.getEventListItem(position);
+					mManager.setDbFeed(item.feedUri);
+					
+					mEventListDialog.dismiss();
+					refreshFragmentView();
+				}
+			});
+			
+			// disable empty
+			LinearLayout emptyLayout = (LinearLayout) listRoot.findViewById(android.R.id.empty);
+			emptyLayout.setVisibility(View.GONE);
+			
+			// show progress dialog
+			mProgressDialog = new ProgressDialog(mContext);
+			mProgressDialog.setMessage(mContext.getString(R.string.event_list_loading));
+			mProgressDialog.setIndeterminate(true);
+			mProgressDialog.setCancelable(false);
+			mProgressDialog.show();
+		}
+
+		@Override
+		protected Boolean doInBackground(Void... params) {
+			mManager.loadEventList();
+			return true;
+		}
+
+		@Override
+		protected void onPostExecute(Boolean result) {
+			try {
+				if (mProgressDialog != null && mProgressDialog.isShowing()) {
+					mProgressDialog.dismiss();
+					mProgressDialog = null;
+				}
+				// show dialog
+				if (mEventListDialog != null) {
+					mEventListDialog.show();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }

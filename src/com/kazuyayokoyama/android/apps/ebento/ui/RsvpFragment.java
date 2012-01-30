@@ -50,11 +50,35 @@ public class RsvpFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         mRootView = (ViewGroup) inflater.inflate(R.layout.fragment_rsvp, container);
+        mYesButton = (Button) mRootView.findViewById(R.id.yes_button);
+        mMaybeButton = (Button) mRootView.findViewById(R.id.maybe_button);
+        mNoButton = (Button) mRootView.findViewById(R.id.no_button);
         
+        return mRootView;
+    }
+
+	@Override
+	public void onAttach(SupportActivity activity) {
+		super.onAttach(activity);
+
+        try {
+        	mListener = (OnRsvpSelectedListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement OnRsvpSelectedListener");
+        }
+	}
+
+	@Override
+	public void onResume() {
+    	super.onResume();
+
+    	refreshView();
+	}
+	
+	public void refreshView() {
         final Event event = mManager.getEvent();
         int currentState = mManager.getLocalState();
         
-        mYesButton = (Button) mRootView.findViewById(R.id.yes_button);
         mYesButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
     			// message
@@ -74,7 +98,6 @@ public class RsvpFragment extends Fragment {
             	mListener.onRsvpSelected(People.STATE_YES);
             }
         });
-        mMaybeButton = (Button) mRootView.findViewById(R.id.maybe_button);
         mMaybeButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
     			// message
@@ -94,7 +117,6 @@ public class RsvpFragment extends Fragment {
             	mListener.onRsvpSelected(People.STATE_MAYBE);
             }
         });
-        mNoButton = (Button) mRootView.findViewById(R.id.no_button);
         mNoButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
     			// message
@@ -137,20 +159,7 @@ public class RsvpFragment extends Fragment {
         	setDeselected(mNoButton);
         	break;
         }
-        
-        return mRootView;
-    }
-
-	@Override
-	public void onAttach(SupportActivity activity) {
-		super.onAttach(activity);
-
-        try {
-        	mListener = (OnRsvpSelectedListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement OnRsvpSelectedListener");
-        }
-	}    
+	}
     
     private void setSelected(Button b) {
         if (UIUtils.isHoneycomb()) {
