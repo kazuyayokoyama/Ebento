@@ -63,28 +63,36 @@ public class HomeActivity extends FragmentActivity {
 			if (bInstalled) {
 				goMusubi();
 			} else {
-				goMarket();
+				goMusubiOnMarket();
 			}
 		} else {
 			// create Musubi Instance
 			Intent intent = getIntent();
 			mMusubi = Musubi.getInstance(this);
-			// get version code
-			int versionCode = 0;
-			try {
-				PackageInfo packageInfo = getPackageManager().getPackageInfo(
-						"com.kazuyayokoyama.android.apps.ebento", PackageManager.GET_META_DATA);
-				versionCode = packageInfo.versionCode;
-			} catch (NameNotFoundException e) {
-			    e.printStackTrace();
-			}
-			mManager.init(mMusubi, (Uri) intent.getParcelableExtra(Musubi.EXTRA_FEED_URI), versionCode);
 
-			// Has Event
-			if (mManager.hasEvent()) {
-				goEvent();
+			// Check iif this activity launched from apps feed
+			if (mMusubi == null || mMusubi.getObj() == null || mMusubi.getObj().getSubfeed() == null) {
+				// go to market
+				goMarket();
+				
 			} else {
-				goList();
+				// get version code
+				int versionCode = 0;
+				try {
+					PackageInfo packageInfo = getPackageManager().getPackageInfo(
+							"com.kazuyayokoyama.android.apps.ebento", PackageManager.GET_META_DATA);
+					versionCode = packageInfo.versionCode;
+				} catch (NameNotFoundException e) {
+				    e.printStackTrace();
+				}
+				mManager.init(mMusubi, (Uri) intent.getParcelableExtra(Musubi.EXTRA_FEED_URI), versionCode);
+	
+				// Has Event
+				if (mManager.hasEvent()) {
+					goEvent();
+				} else {
+					goList();
+				}
 			}
 		}
     }
@@ -116,7 +124,7 @@ public class HomeActivity extends FragmentActivity {
 		startActivityForResult(intent, REQUEST_EVENT_LIST);
     }
     
-	public void goMarket() {
+	public void goMusubiOnMarket() {
 		AlertDialog.Builder marketDialog = new AlertDialog.Builder(this)
 				.setTitle(R.string.market_dialog_title)
 				.setMessage(R.string.market_dialog_text)
@@ -154,7 +162,7 @@ public class HomeActivity extends FragmentActivity {
 			                startActivity(intent);
 			                finish();
 						} catch (Exception e) {
-							goMarket();
+							goMusubiOnMarket();
 						}
 					}
 				})
@@ -165,5 +173,13 @@ public class HomeActivity extends FragmentActivity {
 							}
 						});
 		musubiDialog.create().show();
+	}
+    
+	private void goMarket() {
+		// Go to Market
+		Uri uri = Uri.parse("market://details?id=com.kazuyayokoyama.android.apps.ebento");
+		Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+		startActivity(intent);
+        finish();
 	}
 }

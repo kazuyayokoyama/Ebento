@@ -50,6 +50,8 @@ import com.kazuyayokoyama.android.apps.ebento.util.DateTimeUtils;
 import com.kazuyayokoyama.android.apps.ebento.util.UIUtils;
 
 public class EventActivity extends FragmentActivity implements OnRsvpSelectedListener {
+	public static final String EXTRA_LAUNCHED_FROM_LIST = "launched_from_list";
+	
 	private static final String TAG = "EventActivity";
 	private static final int REQUEST_PEOPLE = 0;
 	private static final int REQUEST_EDIT = 1;
@@ -57,15 +59,18 @@ public class EventActivity extends FragmentActivity implements OnRsvpSelectedLis
     private EventFragment mEventFragment;
     private RsvpFragment mRsvpFragment;
     private PeopleListFragment mPeopleListFragment;
+    private boolean mbLaunchedFromList = false;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event);
+        
+        mbLaunchedFromList = getIntent().hasExtra(EXTRA_LAUNCHED_FROM_LIST);
 
 		final ActionBar actionBar = getSupportActionBar();
 		// set defaults for logo & home up
-		actionBar.setDisplayHomeAsUpEnabled(false);
+		actionBar.setDisplayHomeAsUpEnabled(mbLaunchedFromList);
 		actionBar.setDisplayUseLogoEnabled(false);
 		actionBar.setDisplayShowTitleEnabled(false);
 
@@ -96,7 +101,12 @@ public class EventActivity extends FragmentActivity implements OnRsvpSelectedLis
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getItemId() == R.id.menu_people) {
+		if (item.getItemId() == android.R.id.home) {
+			if (mbLaunchedFromList) {
+				finish();
+			}
+			return true;
+		} else if (item.getItemId() == R.id.menu_people) {
 			goPeople();
 			return true;
 		} else if (item.getItemId() == R.id.menu_edit) {

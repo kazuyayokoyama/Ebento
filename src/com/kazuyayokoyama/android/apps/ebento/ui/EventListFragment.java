@@ -73,6 +73,7 @@ public class EventListFragment extends ListFragment {
 		
 		// Intent
 		Intent intent = new Intent(getActivity(), EventActivity.class);
+		intent.putExtra(EventActivity.EXTRA_LAUNCHED_FROM_LIST, true);
 		startActivity(intent);
 	}
 
