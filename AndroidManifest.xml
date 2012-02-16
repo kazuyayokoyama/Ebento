@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.kazuyayokoyama.android.apps.ebento"
-    android:versionCode="2"
-    android:versionName="1.0.1" >
+    package="mobisocial.bento.ebento"
+    android:versionCode="3"
+    android:versionName="1.1.0" >
 
     <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="15" />
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
@@ -46,7 +46,7 @@
         </activity>
         
         <activity
-            android:name=".ui.EditActivity"
+            android:name="mobisocial.bento.ebento.ui.EditActivity"
             android:label="@string/label_create_event" >
         </activity>
         

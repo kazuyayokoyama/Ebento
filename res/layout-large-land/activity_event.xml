@@ -29,20 +29,20 @@
 	    android:layout_marginRight="0dip"
 	    android:layout_weight="1">
 	    
-        <fragment android:name="com.kazuyayokoyama.android.apps.ebento.ui.EventFragment"
+        <fragment android:name="mobisocial.bento.ebento.ui.EventFragment"
             android:id="@+id/fragment_event"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1" />
 
-        <fragment android:name="com.kazuyayokoyama.android.apps.ebento.ui.RsvpFragment"
+        <fragment android:name="mobisocial.bento.ebento.ui.RsvpFragment"
             android:id="@+id/fragment_rsvp"
             android:layout_width="match_parent"
             android:layout_height="@dimen/rsvp_height" />
 
     </LinearLayout>
         
-    <fragment android:name="com.kazuyayokoyama.android.apps.ebento.ui.PeopleListFragment"
+    <fragment android:name="mobisocial.bento.ebento.ui.PeopleListFragment"
         android:id="@+id/fragment_people_list"
         android:layout_width="@dimen/people_width"
         android:layout_height="match_parent" />

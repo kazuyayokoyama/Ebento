@@ -20,7 +20,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <fragment android:name="com.kazuyayokoyama.android.apps.ebento.ui.PeopleListFragment"
+    <fragment android:name="mobisocial.bento.ebento.ui.PeopleListFragment"
         android:id="@+id/fragment_people_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

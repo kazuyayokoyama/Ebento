@@ -20,7 +20,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <fragment android:name="com.kazuyayokoyama.android.apps.ebento.ui.EditFragment"
+    <fragment android:name="mobisocial.bento.ebento.ui.EditFragment"
         android:id="@+id/fragment_edit"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

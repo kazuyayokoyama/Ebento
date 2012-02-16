@@ -20,13 +20,13 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <fragment android:name="com.kazuyayokoyama.android.apps.ebento.ui.EventFragment"
+    <fragment android:name="mobisocial.bento.ebento.ui.EventFragment"
         android:id="@+id/fragment_event"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1" />
 
-    <fragment android:name="com.kazuyayokoyama.android.apps.ebento.ui.RsvpFragment"
+    <fragment android:name="mobisocial.bento.ebento.ui.RsvpFragment"
         android:id="@+id/fragment_rsvp"
         android:layout_width="match_parent"
         android:layout_height="@dimen/rsvp_height" />
