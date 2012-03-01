@@ -87,8 +87,8 @@
     <string name="edit_event_place_hint">Event location</string>
     <string name="edit_event_details">Detail (if any)</string>
     <string name="edit_event_details_hint">Event detail</string>
-    <string name="edit_event_image">Picture (if any)</string>
-    <string name="edit_event_image_button">Pickup Picture</string>
+    <string name="edit_event_image">Event Image (if any)</string>
+    <string name="edit_event_image_button">Pickup Image</string>
     <string name="edit_event_image_description">Image of the event</string>
     
     <!-- RSVP -->
