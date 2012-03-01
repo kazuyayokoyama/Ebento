@@ -21,15 +21,16 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.UUID;
 
+import mobisocial.bento.ebento.R;
 import mobisocial.bento.ebento.io.Event;
 import mobisocial.bento.ebento.io.EventManager;
 import mobisocial.bento.ebento.ui.quickaction.ActionItem;
 import mobisocial.bento.ebento.ui.quickaction.QuickAction;
 import mobisocial.bento.ebento.util.BitmapHelper;
 import mobisocial.bento.ebento.util.DateTimeUtils;
+import mobisocial.bento.ebento.util.DateTimeUtils.DateTime;
 import mobisocial.bento.ebento.util.JpgFileHelper;
 import mobisocial.bento.ebento.util.UIUtils;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -55,8 +56,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TimePicker;
-
-import mobisocial.bento.ebento.R;
+import android.widget.Toast;
 
 public class EditFragment extends Fragment {
 	
@@ -176,12 +176,22 @@ public class EditFragment extends Fragment {
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                            	mStartDateTime.year = year;
-                            	mStartDateTime.month = (monthOfYear + 1);
-                            	mStartDateTime.day = dayOfMonth;
-                                
-                            	mEndDateTime = DateTimeUtils.getEndTimeFromStartTime(mStartDateTime, mEndDateTime);
-                            	setDateTimeButtonText();
+                            	DateTime candidateStart = new DateTime();
+                            	candidateStart.year = year;
+                            	candidateStart.month = (monthOfYear + 1);
+                            	candidateStart.day = dayOfMonth;
+                            	candidateStart.hour = mStartDateTime.hour;
+                            	candidateStart.minute = mStartDateTime.minute;
+                            	if (DateTimeUtils.isPastDateTime(candidateStart)) {
+                    				Toast.makeText(getActivity(), R.string.toast_edit_past_time, Toast.LENGTH_SHORT).show();
+                            	} else {
+	                            	mStartDateTime.year = year;
+	                            	mStartDateTime.month = (monthOfYear + 1);
+	                            	mStartDateTime.day = dayOfMonth;
+	                                
+	                            	mEndDateTime = DateTimeUtils.getEndTimeFromStartTime(mStartDateTime, mEndDateTime);
+	                            	setDateTimeButtonText();
+                            	}
                             }
                         },
                         mStartDateTime.year, (mStartDateTime.month - 1), mStartDateTime.day);
@@ -196,12 +206,31 @@ public class EditFragment extends Fragment {
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                            	mEndDateTime.year = year;
-                            	mEndDateTime.month = (monthOfYear + 1);
-                            	mEndDateTime.day = dayOfMonth;
-                                
-                            	mStartDateTime = DateTimeUtils.getStartTimeFromEndTime(mStartDateTime, mEndDateTime);
-                            	setDateTimeButtonText();
+                            	DateTime candidateEnd = new DateTime();
+                            	candidateEnd.year = year;
+                            	candidateEnd.month = (monthOfYear + 1);
+                            	candidateEnd.day = dayOfMonth;
+                            	candidateEnd.hour = mEndDateTime.hour;
+                            	candidateEnd.minute = mEndDateTime.minute;
+
+                            	DateTime candidateStart = new DateTime();
+                            	candidateStart.year = mStartDateTime.year;
+                            	candidateStart.month = mStartDateTime.month;
+                            	candidateStart.day = mStartDateTime.day;
+                            	candidateStart.hour = mStartDateTime.hour;
+                            	candidateStart.minute = mStartDateTime.minute;
+                            	candidateStart = DateTimeUtils.getStartTimeFromEndTime(candidateStart, candidateEnd);
+                            	
+                            	if (DateTimeUtils.isPastDateTime(candidateStart) || DateTimeUtils.isPastDateTime(candidateEnd)) {
+                    				Toast.makeText(getActivity(), R.string.toast_edit_past_time, Toast.LENGTH_SHORT).show();
+                            	} else {
+	                            	mEndDateTime.year = year;
+	                            	mEndDateTime.month = (monthOfYear + 1);
+	                            	mEndDateTime.day = dayOfMonth;
+	                                
+	                            	mStartDateTime = DateTimeUtils.getStartTimeFromEndTime(mStartDateTime, mEndDateTime);
+	                            	setDateTimeButtonText();
+                            	}
                             }
                         },
                         mEndDateTime.year, (mEndDateTime.month - 1), mEndDateTime.day);
@@ -217,14 +246,24 @@ public class EditFragment extends Fragment {
                         new TimePickerDialog.OnTimeSetListener() {
                             @Override
                             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                            	mStartDateTime.hour = hourOfDay;
-                            	mStartDateTime.minute = minute;
-                            	
-                            	mEndDateTime = DateTimeUtils.getEndTimeFromStartTime(mStartDateTime, mEndDateTime);
-                            	setDateTimeButtonText();
+                            	DateTime candidateStart = new DateTime();
+                            	candidateStart.year = mStartDateTime.year;
+                            	candidateStart.month = mStartDateTime.month;
+                            	candidateStart.day = mStartDateTime.day;
+                            	candidateStart.hour = hourOfDay;
+                            	candidateStart.minute = minute;
+                            	if (DateTimeUtils.isPastDateTime(candidateStart)) {
+                    				Toast.makeText(getActivity(), R.string.toast_edit_past_time, Toast.LENGTH_SHORT).show();
+                            	} else {
+	                            	mStartDateTime.hour = hourOfDay;
+	                            	mStartDateTime.minute = minute;
+	                            	
+	                            	mEndDateTime = DateTimeUtils.getEndTimeFromStartTime(mStartDateTime, mEndDateTime);
+	                            	setDateTimeButtonText();
+                            	}
                             }
                         },
-                        mStartDateTime.hour, mStartDateTime.minute, true);
+                        mStartDateTime.hour, mStartDateTime.minute, false);
             	timePickerDialog.show();
             }
         });
@@ -236,14 +275,33 @@ public class EditFragment extends Fragment {
                         new TimePickerDialog.OnTimeSetListener() {
                             @Override
                             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                            	mEndDateTime.hour = hourOfDay;
-                            	mEndDateTime.minute = minute;
+                            	DateTime candidateEnd = new DateTime();
+                            	candidateEnd.year = mEndDateTime.year;
+                            	candidateEnd.month = mEndDateTime.month;
+                            	candidateEnd.day = mEndDateTime.day;
+                            	candidateEnd.hour = hourOfDay;
+                            	candidateEnd.minute = minute;
 
-                            	mStartDateTime = DateTimeUtils.getStartTimeFromEndTime(mStartDateTime, mEndDateTime);
-                            	setDateTimeButtonText();
+                            	DateTime candidateStart = new DateTime();
+                            	candidateStart.year = mStartDateTime.year;
+                            	candidateStart.month = mStartDateTime.month;
+                            	candidateStart.day = mStartDateTime.day;
+                            	candidateStart.hour = mStartDateTime.hour;
+                            	candidateStart.minute = mStartDateTime.minute;
+                            	candidateStart = DateTimeUtils.getStartTimeFromEndTime(candidateStart, candidateEnd);
+                            	
+                            	if (DateTimeUtils.isPastDateTime(candidateStart) || DateTimeUtils.isPastDateTime(candidateEnd)) {
+                    				Toast.makeText(getActivity(), R.string.toast_edit_past_time, Toast.LENGTH_SHORT).show();
+                            	} else {
+	                            	mEndDateTime.hour = hourOfDay;
+	                            	mEndDateTime.minute = minute;
+	
+	                            	mStartDateTime = DateTimeUtils.getStartTimeFromEndTime(mStartDateTime, mEndDateTime);
+	                            	setDateTimeButtonText();
+                            	}
                             }
                         },
-                        mEndDateTime.hour, mEndDateTime.minute, true);
+                        mEndDateTime.hour, mEndDateTime.minute, false);
             	timePickerDialog.show();
             }
         });

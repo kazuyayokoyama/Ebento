@@ -149,4 +149,15 @@ public class DateTimeUtils {
     	
     	return getDateTimeFromCal(startCal);
     }
+    
+    public static boolean isPastDateTime(DateTime target) {
+    	boolean bPast = false;
+    	Calendar targetCal = getCalFromDateTime(target);
+    	Calendar currentCal = Calendar.getInstance();
+    	// if current > target
+    	if (currentCal.compareTo(targetCal) > 0) {
+    		bPast = true;
+    	}
+    	return bPast;
+    }
 }

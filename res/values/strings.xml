@@ -105,6 +105,7 @@
     <string name="feed_msg_no">Hmm, <xliff:g id="name">%1$s</xliff:g> declined.</string>
     
     <!-- Toast -->
+    <string name="toast_edit_past_time">Sorry.\nYou can\'t set the past time.</string>
     <string name="toast_calendar_added_success">Great!\nThe Event is added to your calendar.</string>
     <string name="toast_calendar_added_failure">Sorry.\nThe Event is not added.</string>
     
