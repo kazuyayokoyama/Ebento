@@ -88,6 +88,8 @@ public class EditFragment extends Fragment {
     private DateTimeUtils.DateTime mEndDateTime = new DateTimeUtils.DateTime();
     private ImageView mImageView;
     private Button mImageButton;
+    private Button mSaveButton;
+    private Button mCancelButton;
     
     private EventManager mManager = EventManager.getInstance();
 	private boolean mbNewEventMode = true;
@@ -366,6 +368,20 @@ public class EditFragment extends Fragment {
 			public void onDismiss() {
 			}
 		});
+
+        // Save/Cancel Buttons
+		mSaveButton = (Button) mRootView.findViewById(R.id.save_button);
+		mSaveButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+            	goSave();
+            }
+        });
+		mCancelButton = (Button) mRootView.findViewById(R.id.cancel_button);
+		mCancelButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+            	getActivity().finish();
+            }
+        });
         
         return mRootView;
     }
