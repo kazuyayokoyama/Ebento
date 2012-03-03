@@ -16,43 +16,34 @@
 
 package mobisocial.bento.ebento.ui;
 
+import mobisocial.bento.ebento.R;
 import mobisocial.bento.ebento.io.Event;
 import mobisocial.bento.ebento.io.EventManager;
 import mobisocial.bento.ebento.io.EventManager.OnStateUpdatedListener;
 import mobisocial.bento.ebento.ui.RsvpFragment.OnRsvpSelectedListener;
-import mobisocial.bento.ebento.util.DateTimeUtils;
-import mobisocial.bento.ebento.util.UIUtils;
+import mobisocial.bento.ebento.util.CalendarHelper;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.CalendarContract;
 import android.support.v4.app.ActionBar;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.Menu;
 import android.support.v4.view.MenuItem;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Toast;
-
-import mobisocial.bento.ebento.R;
 
 public class EventActivity extends FragmentActivity implements OnRsvpSelectedListener {
 	public static final String EXTRA_LAUNCHED_FROM_LIST = "launched_from_list";
 	
-	private static final String TAG = "EventActivity";
+	//private static final String TAG = "EventActivity";
 	private static final int REQUEST_PEOPLE = 0;
 	private static final int REQUEST_EDIT = 1;
     private EventManager mManager = EventManager.getInstance();
@@ -184,67 +175,7 @@ public class EventActivity extends FragmentActivity implements OnRsvpSelectedLis
 	
 	private void createNewEvent() {
 		Event event = mManager.getEvent();
-		
-		long startMsec = DateTimeUtils.getMilliSeconds(
-				event.startDate.year, event.startDate.month, event.startDate.day, 
-				event.startTime.hour, event.startTime.minute);
-
-		long endMsec = 0;
-        if (event.endTime.hour >= 0 && event.endTime.minute >= 0) {
-        	endMsec = DateTimeUtils.getMilliSeconds(
-    				event.endDate.year, event.endDate.month, event.endDate.day, 
-    				event.endTime.hour, event.endTime.minute);
-        } else {
-        	// an hour ahead
-        	endMsec = startMsec + (1000 * 60 * 60);
-        }
-        
-        // ICS
-        if (UIUtils.isIceCreamSandwich()) {
-    		Intent intent = new Intent(Intent.ACTION_INSERT);
-    		intent.setData(CalendarContract.Events.CONTENT_URI);
-    		intent.putExtra(CalendarContract.Events.TITLE, event.title);
-    		intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, startMsec);
-    		intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endMsec);
-    		if (event.place.length() > 0) intent.putExtra(CalendarContract.Events.EVENT_LOCATION, event.place);
-    		if (event.details.length() > 0) intent.putExtra(CalendarContract.Events.DESCRIPTION, event.details);
-    		startActivity(intent);
-        } else {
-        	Uri calendarUri;
-        	Uri eventUri;
-        	// Froyo
-        	if (UIUtils.isFroyo()) {
-        		calendarUri = Uri.parse("content://com.android.calendar/calendars");
-        		eventUri = Uri.parse("content://com.android.calendar/events");
-        	} else {
-        		calendarUri = Uri.parse("content://calendar/calendars");
-        		eventUri = Uri.parse("content://calendar/events");
-        	}
-
-        	Cursor cursor = getContentResolver().query(
-        			calendarUri, new String[]{"_id", "displayname"}, null, null, null);
-        	if (cursor != null && cursor.moveToFirst()) {
-        		// TODO : first found calendar
-        		int calId = cursor.getInt(0);
-        		Log.d(TAG, "calId=" + calId + " calName=" + cursor.getString(1));
-	        	
-	        	ContentValues cv = new ContentValues();
-	        	cv.put("calendar_id", calId);
-	        	cv.put("title", event.title);
-	        	cv.put("dtstart", startMsec);
-	        	cv.put("dtend", endMsec);
-	    		if (event.place.length() > 0) cv.put("eventLocation", event.place);
-	    		if (event.details.length() > 0) cv.put("description", event.details);
-	        	ContentResolver cr = getContentResolver();
-	        	Uri added = cr.insert(eventUri, cv);
-        		Log.d(TAG, "added calendar uri=" + added.toString());
-
-				Toast.makeText(this, R.string.toast_calendar_added_success, Toast.LENGTH_SHORT).show();
-        	} else {
-				Toast.makeText(this, R.string.toast_calendar_added_failure, Toast.LENGTH_SHORT).show();
-        	}
-        	cursor.close();
-        }
+		CalendarHelper.addEventToCalendar(this, event);
 	}
 	
 	private void goEventList() {

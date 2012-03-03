@@ -90,6 +90,9 @@
     <string name="edit_event_image">Event Image (if any)</string>
     <string name="edit_event_image_button">Pickup Image</string>
     <string name="edit_event_image_description">Image of the event</string>
+    <string name="edit_event_add_cal">Add to Calender</string>
+    <string name="edit_event_add_cal_checkbox">Add this event to calendar</string>
+    <string name="edit_event_add_cal_checkbox_sub">Calendar app will be opened when saved</string>
     <string name="edit_event_button_save">Save</string>
     <string name="edit_event_button_cancel">Cancel</string>
     

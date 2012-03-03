@@ -27,6 +27,7 @@ import mobisocial.bento.ebento.io.EventManager;
 import mobisocial.bento.ebento.ui.quickaction.ActionItem;
 import mobisocial.bento.ebento.ui.quickaction.QuickAction;
 import mobisocial.bento.ebento.util.BitmapHelper;
+import mobisocial.bento.ebento.util.CalendarHelper;
 import mobisocial.bento.ebento.util.DateTimeUtils;
 import mobisocial.bento.ebento.util.DateTimeUtils.DateTime;
 import mobisocial.bento.ebento.util.JpgFileHelper;
@@ -52,9 +53,12 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -88,6 +92,10 @@ public class EditFragment extends Fragment {
     private DateTimeUtils.DateTime mEndDateTime = new DateTimeUtils.DateTime();
     private ImageView mImageView;
     private Button mImageButton;
+    private CheckBox mAddCalCheckBox;
+    private TextView mAddCalText;
+    private LinearLayout mAddCalLayout;
+    private TextView mAddCalSub;
     private Button mSaveButton;
     private Button mCancelButton;
     
@@ -368,6 +376,22 @@ public class EditFragment extends Fragment {
 			public void onDismiss() {
 			}
 		});
+		
+		// Add Cal
+		mAddCalCheckBox = (CheckBox) mRootView.findViewById(R.id.add_cal_checkbox);
+		mAddCalText = (TextView) mRootView.findViewById(R.id.add_cal_text);
+		mAddCalLayout = (LinearLayout) mRootView.findViewById(R.id.add_cal_layout);
+		mAddCalSub = (TextView) mRootView.findViewById(R.id.add_cal_sub);
+		
+		if (!mbNewEventMode) {
+			mAddCalText.setVisibility(View.GONE);
+			mAddCalLayout.setVisibility(View.GONE);
+		} else {
+			// not ICS
+	        if (! UIUtils.isIceCreamSandwich()) {
+	        	mAddCalSub.setVisibility(View.GONE);
+	        }
+		}
 
         // Save/Cancel Buttons
 		mSaveButton = (Button) mRootView.findViewById(R.id.save_button);
@@ -537,6 +561,11 @@ public class EditFragment extends Fragment {
 			String htmlMsg = UIUtils.getHtmlString(event.title, dateTimeMsg, msg.toString());
 			
 			mManager.createEvent(event, htmlMsg);
+			
+			// Add to Cal
+			if (mAddCalCheckBox.isChecked()) {
+				CalendarHelper.addEventToCalendar(getActivity(), event);
+			}
 			
 			// back to home
 			Intent intent = new Intent();

@@ -2,4 +2,5 @@
     <color name="event_divider">#ffcccccc</color>
     <color name="system_green">#ff669900</color>
     <color name="system_blue">#ff0099cc</color>
+    <color name="system_gray">#99000000</color>
 </resources>

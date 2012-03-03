@@ -146,6 +146,50 @@
 			    android:src="@drawable/default_image_event"
 			    android:contentDescription="@string/edit_event_image_description"  />
 			
+			<!-- Add to Cal Option -->
+		    <TextView android:id="@+id/add_cal_text"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_marginTop="10dip"
+		        android:textStyle="bold"
+		        android:text="@string/edit_event_add_cal" />
+			<LinearLayout android:id="@+id/add_cal_layout"
+			    android:orientation="horizontal"
+				android:layout_marginTop="0dip"
+			    android:layout_width="match_parent"
+			    android:layout_height="wrap_content">
+			    
+			   	<CheckBox android:id="@+id/add_cal_checkbox"
+					android:focusable="false"
+					android:focusableInTouchMode="false"
+				  	android:layout_width="wrap_content"
+				  	android:layout_height="wrap_content" />
+			   	
+			    <LinearLayout
+			        android:layout_width="match_parent"
+			        android:layout_height="wrap_content"
+			        android:layout_gravity="center_vertical"
+			        android:paddingLeft="3dip"
+			    	android:orientation="vertical">
+			        <TextView
+						android:focusable="false"
+						android:focusableInTouchMode="false"
+			            android:layout_alignParentLeft="true"
+			            android:layout_width="match_parent"
+			            android:layout_height="wrap_content"
+			            android:text="@string/edit_event_add_cal_checkbox" />
+			        <TextView android:id="@+id/add_cal_sub"
+						android:focusable="false"
+						android:focusableInTouchMode="false"
+			            android:layout_alignParentLeft="true"
+			            android:layout_width="match_parent"
+			            android:layout_height="wrap_content"
+			            android:text="@string/edit_event_add_cal_checkbox_sub"
+			            style="@style/Subtitle" />
+		    	</LinearLayout>
+		        
+		    </LinearLayout>
+			
 		    <!-- Divider -->	
 			<View android:id="@+id/divider"
 			    android:layout_width="match_parent"
@@ -154,7 +198,7 @@
 	            android:layout_marginTop="10dip"
 		        android:layout_marginRight="10dip"
                 android:background="@color/event_divider" />
-		              
+
 			<!-- Buttons -->
 			<LinearLayout
 			    android:orientation="horizontal"

@@ -5,6 +5,11 @@
     	<item name="abIcon">@drawable/action_bar_logo</item>
     </style>
     
+    <style name="Subtitle">
+        <item name="android:textSize">@dimen/text_size_tiny</item>
+        <item name="android:textColor">@color/system_gray</item>
+    </style>
+    
 	<style name="Animations" />
 
 	<!-- QuickAction -->
