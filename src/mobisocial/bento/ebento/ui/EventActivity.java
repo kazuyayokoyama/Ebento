@@ -22,6 +22,9 @@ import mobisocial.bento.ebento.io.EventManager;
 import mobisocial.bento.ebento.io.EventManager.OnStateUpdatedListener;
 import mobisocial.bento.ebento.ui.RsvpFragment.OnRsvpSelectedListener;
 import mobisocial.bento.ebento.util.CalendarHelper;
+import mobisocial.bento.ebento.util.InitialHelper;
+import mobisocial.bento.ebento.util.InitialHelper.OnInitCompleteListener;
+import mobisocial.socialkit.musubi.Musubi;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -59,8 +62,18 @@ public class EventActivity extends FragmentActivity implements OnRsvpSelectedLis
         
         mbLaunchedFromList = getIntent().hasExtra(EXTRA_LAUNCHED_FROM_LIST);
 
+        if (!mbLaunchedFromList) {
+			// create Musubi Instance
+	        InitialHelper initHelper = new InitialHelper(this, mInitCompleteListener);
+			Musubi musubi = initHelper.initMusubiInstance(false);
+			if (musubi == null) {
+				return;
+			}
+        }
+        
 		final ActionBar actionBar = getSupportActionBar();
 		// set defaults for logo & home up
+		actionBar.setDisplayHomeAsUpEnabled(true); // bad know-how for enabling home clickable on ICS.
 		actionBar.setDisplayHomeAsUpEnabled(mbLaunchedFromList);
 		actionBar.setDisplayUseLogoEnabled(false);
 		actionBar.setDisplayShowTitleEnabled(false);
@@ -93,10 +106,13 @@ public class EventActivity extends FragmentActivity implements OnRsvpSelectedLis
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == android.R.id.home) {
-			if (mbLaunchedFromList) {
-				finish();
-			}
-			return true;
+        	if (mbLaunchedFromList) {
+        		finish();
+        		return true;
+        	} else {
+        		goEventList();
+        		return true;
+        	}
 		} else if (item.getItemId() == R.id.menu_people) {
 			goPeople();
 			return true;
@@ -123,6 +139,15 @@ public class EventActivity extends FragmentActivity implements OnRsvpSelectedLis
 	public void onRsvpSelected(int state) {
 		refreshFragmentView();
 	}
+	
+	// never fired because init will be done sync, not async
+	// InitialHelper > OnInitCompleteListener
+	private OnInitCompleteListener mInitCompleteListener = new OnInitCompleteListener() {
+		@Override
+		public void onInitCompleted() {
+			refreshFragmentView();
+		}
+	};
 	
 	// EventManager > OnStateUpdatedListener
 	private OnStateUpdatedListener mStateUpdatedListener = new OnStateUpdatedListener() {
@@ -228,7 +253,7 @@ public class EventActivity extends FragmentActivity implements OnRsvpSelectedLis
 			listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 					EventListItem item = mManager.getEventListItem(position);
-					mManager.setDbFeed(item.feedUri);
+					mManager.setEventObjUri(item.objUri);
 					
 					mEventListDialog.dismiss();
 					refreshFragmentView();

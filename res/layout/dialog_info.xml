@@ -14,10 +14,19 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/home_root"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
-
+<LinearLayout
+  	xmlns:android="http://schemas.android.com/apk/res/android"
+  	android:layout_width="300dip"
+  	android:layout_height="match_parent"
+  	android:orientation="vertical">
+ 
+    <WebView
+        android:id="@+id/webview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="2dip"
+		android:layout_marginRight="2dip"
+        android:scrollHorizontally="true"
+        android:gravity="fill_horizontal" />
+        
 </LinearLayout>

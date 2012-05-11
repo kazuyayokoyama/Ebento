@@ -21,6 +21,11 @@ import android.content.res.Configuration;
 import android.os.Build;
 
 public class UIUtils {
+	private static final Boolean DEBUG = true;
+	
+	public static boolean isDebugMode() {
+		return DEBUG;
+	}
 
     public static boolean isIceCreamSandwich() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH;
@@ -44,20 +49,8 @@ public class UIUtils {
         return isHoneycomb() && isTablet(context);
     }
 
-    public static String getHtmlString(String subjectTitle, String subjectDateTime, String msg) {
-        StringBuilder html = new StringBuilder("<html><head><style>");
-        //html.append("body { font-family:Verdana; }");
-        html.append("td { border:0px min-width:10px; }");
-        html.append("table { background-color:#00FFFFFF; padding:1px;}");
-        html.append("</style></head>");
-        html.append("<body><div><table><tr>");
-        html.append("<td><b>").append(subjectTitle).append("</b></td>");
-        html.append("</tr><tr>");
-        html.append("<td><b>").append(subjectDateTime).append("</b></td>");
-        html.append("</tr><tr>");
-        html.append("<td>").append(msg).append("</td>");
-        html.append("</tr></table></body></div>");
-        html.append("</html>");
-        return html.toString();
+    
+    public static String getPlainString(String subjectTitle, String subjectDateTime, String msg) {
+        return "✎" + subjectTitle + "\n" + subjectDateTime + "\n" + msg;
     }
 }

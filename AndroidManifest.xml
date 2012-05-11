@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="mobisocial.bento.ebento"
-    android:versionCode="3"
-    android:versionName="1.1.0" >
+    android:versionCode="4"
+    android:versionName="2.0.0" >
 
     <uses-sdk android:minSdkVersion="4" android:targetSdkVersion="15" />
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 	<uses-permission android:name="android.permission.READ_CALENDAR" />
 	<uses-permission android:name="android.permission.WRITE_CALENDAR" />
+	<uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:icon="@drawable/icon"
@@ -15,39 +16,34 @@
         android:theme="@style/Theme.SherlockCustom" >
         
         <activity
-            android:name=".ui.HomeActivity"
-            android:label="@string/app_name"
-            android:configChanges="orientation|keyboardHidden|screenSize" >
+            android:name=".ui.EventListActivity"
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="musubi.intent.category.MENU" />
+                <category android:name="musubi.intent.category.DEFAULT" />
             </intent-filter>
-            
-            <intent-filter>
-                <action android:name="mobisocial.intent.action.CONNECTED" />
-                <category android:name="android.intent.category.LAUNCHER" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        
-        <activity
-            android:name=".ui.EventListActivity"
-            android:label="@string/label_event_list" >
         </activity>
         
         <activity
             android:name=".ui.EventActivity"
-            android:label="@string/label_event" >
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.musubi.obj/ebento"/>
+            </intent-filter>
         </activity>
         
         <activity
             android:name=".ui.PeopleListActivity"
-            android:label="@string/label_people_list" >
+            android:label="@string/label_people_list">
         </activity>
         
         <activity
-            android:name="mobisocial.bento.ebento.ui.EditActivity"
-            android:label="@string/label_create_event" >
+            android:name=".ui.EditActivity"
+            android:label="@string/label_create_event">
         </activity>
         
     </application>

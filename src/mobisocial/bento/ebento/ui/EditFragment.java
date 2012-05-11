@@ -24,6 +24,7 @@ import java.util.UUID;
 import mobisocial.bento.ebento.R;
 import mobisocial.bento.ebento.io.Event;
 import mobisocial.bento.ebento.io.EventManager;
+import mobisocial.bento.ebento.io.EventManager.OnInitialEventListener;
 import mobisocial.bento.ebento.ui.quickaction.ActionItem;
 import mobisocial.bento.ebento.ui.quickaction.QuickAction;
 import mobisocial.bento.ebento.util.BitmapHelper;
@@ -551,6 +552,7 @@ public class EditFragment extends Fragment {
 			event.creDateMillis = System.currentTimeMillis();
 			event.creContactId = mManager.getLocalContactId();
 			
+	
 			// message
 			StringBuilder msg = new StringBuilder(getString(
 					R.string.feed_msg_event_created));
@@ -558,19 +560,31 @@ public class EditFragment extends Fragment {
 					false,
 	        		event.startDate.year, event.startDate.month, event.startDate.day,
 	        		event.startTime.hour, event.startTime.minute);
-			String htmlMsg = UIUtils.getHtmlString(event.title, dateTimeMsg, msg.toString());
+			final String textMsg = UIUtils.getPlainString(event.title, dateTimeMsg, msg.toString());
+	
+			// init event
+			final Event finEvent = event;
+			mManager.initEvent(event, textMsg, new OnInitialEventListener() {
+				@Override
+				public void onEventInitialized() {
+					Event newEvent = finEvent;
+					newEvent.creContactId = mManager.getLocalContactId();
+					newEvent.modContactId = mManager.getLocalContactId();
+					
+					mManager.createEvent(newEvent, textMsg);
+					
+					// Add to Cal
+					if (mAddCalCheckBox.isChecked()) {
+						CalendarHelper.addEventToCalendar(getActivity(), newEvent);
+					}
+					
+					// back to home
+					Intent intent = new Intent();
+					getActivity().setResult(Activity.RESULT_OK, intent);
+					getActivity().finish();
+				}
+			});
 			
-			mManager.createEvent(event, htmlMsg);
-			
-			// Add to Cal
-			if (mAddCalCheckBox.isChecked()) {
-				CalendarHelper.addEventToCalendar(getActivity(), event);
-			}
-			
-			// back to home
-			Intent intent = new Intent();
-			getActivity().setResult(Activity.RESULT_OK, intent);
-			getActivity().finish();
 			
 		} else {
 			Event prevEvent = mManager.getEvent();
@@ -585,9 +599,9 @@ public class EditFragment extends Fragment {
 					false,
 	        		event.startDate.year, event.startDate.month, event.startDate.day,
 	        		event.startTime.hour, event.startTime.minute);
-			String htmlMsg = UIUtils.getHtmlString(event.title, dateTimeMsg, msg.toString());
+			String textMsg = UIUtils.getPlainString(event.title, dateTimeMsg, msg.toString());
 			
-			mManager.updateEvent(event, htmlMsg);
+			mManager.updateEvent(event, textMsg, false);
 
 			// back to home
 			getActivity().finish();

@@ -3,7 +3,7 @@
 
     <!-- Label -->
     <string name="app_name">Ebento</string>
-    <string name="label_event_list">Ebento / Events List</string>
+    <string name="label_event_list">Ebento</string>
     <string name="label_event">Ebento</string>
     <string name="label_people_list">Ebento / Who\'s going?</string>
     <string name="label_create_event">Ebento / Create Event</string>
@@ -19,6 +19,7 @@
     <string name="menu_event_calendar">Calendar</string>
     <string name="menu_event_list">Events List</string>
     <string name="menu_event_add">New Event</string>
+    <string name="menu_info">Info</string>
     
     <!-- Dialog -->
     <string name="market_dialog_title">Thank you for using Ebento!</string>
@@ -40,6 +41,8 @@
     <string name="event_list_dialog_text"></string>
     <string name="event_list_dialog_ok">OK</string>
     <string name="event_list_dialog_cancel">Cancel</string>
+    <string name="info_dialog_title">Open Source Software</string>
+    <string name="info_dialog_ok">OK</string>
     
     <!-- Event -->
     <string name="event_title_dummy">TGIF CS</string>

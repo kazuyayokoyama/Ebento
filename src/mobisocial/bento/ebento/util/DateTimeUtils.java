@@ -18,7 +18,7 @@ package mobisocial.bento.ebento.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -35,16 +35,16 @@ public class DateTimeUtils {
 	
     public static String getDateWithFormat(int year, int month, int day) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, MMMM d, yyyy");
-        return dateFormat.format(new Date((year - 1900), (month - 1), day));
+        return dateFormat.format(new GregorianCalendar(year, (month - 1), day).getTime());
     }
     public static String getDateWithShortFormat(int year, int month, int day) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM d, yyyy");
-        return dateFormat.format(new Date((year - 1900), (month - 1), day));
+        return dateFormat.format(new GregorianCalendar(year, (month - 1), day).getTime());
     }
     
     public static String getTimeWithFormat(int year, int month, int day, int hour, int minute) {
         SimpleDateFormat timeFormat = new SimpleDateFormat("h:mma");
-        return timeFormat.format(new Date((year - 1900), (month - 1), day, hour, minute));
+        return timeFormat.format(new GregorianCalendar(year, (month - 1), day, hour, minute).getTime());
     }
     
     public static String getTimeWithFormat(DateTime dateTime) {
@@ -59,14 +59,14 @@ public class DateTimeUtils {
         } else {
         	dateTimeFormat= new SimpleDateFormat("EEE, MMM d, h:mma");
     	}
-        return dateTimeFormat.format(new Date((year - 1900), (month - 1), day, hour, minute));
+        return dateTimeFormat.format(new GregorianCalendar(year, (month - 1), day, hour, minute).getTime());
     }
     
     public static long getMilliSeconds(int year, int month, int day, int hour, int minute) {
 
     	Calendar c = Calendar.getInstance();
     	//c.setTimeZone(TimeZone.getTimeZone("UTC"));
-    	c.setTime(new Date((year - 1900), (month - 1), day, hour, minute));
+    	c.setTime(new GregorianCalendar(year, (month - 1), day, hour, minute).getTime());
 
     	return c.getTimeInMillis();
     }
@@ -102,12 +102,12 @@ public class DateTimeUtils {
     
     public static Calendar getCalFromDateTime(DateTime dateTime) {
     	Calendar cal = Calendar.getInstance();
-    	cal.setTime(new Date(
-    			(dateTime.year - 1900), 
+    	cal.setTime(new GregorianCalendar(
+    			dateTime.year, 
     			(dateTime.month - 1), 
     			dateTime.day, 
     			dateTime.hour, 
-    			dateTime.minute));
+    			dateTime.minute).getTime());
     	return cal;
     }
     

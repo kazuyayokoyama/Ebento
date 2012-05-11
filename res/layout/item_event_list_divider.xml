@@ -14,15 +14,21 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/menu_info"
-        android:icon="@drawable/ic_menu_info_details"
-        android:title="@string/menu_info"
-        android:orderInCategory="1"
-        android:showAsAction="always" />
-    <item android:id="@+id/menu_add"
-        android:icon="@drawable/ic_menu_add"
-        android:title="@string/menu_event_add"
-        android:orderInCategory="2"
-        android:showAsAction="always" />
-</menu>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+    
+    <TextView android:id="@+id/feed_name"
+		android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="10dip"
+        android:paddingTop="2dip"
+        android:paddingRight="10dip"
+        android:paddingBottom="2dip"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:background="#fafafa" />
+	  	
+</LinearLayout>

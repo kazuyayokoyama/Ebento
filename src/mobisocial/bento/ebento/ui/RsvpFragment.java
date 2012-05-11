@@ -88,8 +88,8 @@ public class RsvpFragment extends Fragment {
     					false,
     	        		event.startDate.year, event.startDate.month, event.startDate.day,
     	        		event.startTime.hour, event.startTime.minute);
-    			String htmlMsg = UIUtils.getHtmlString(event.title, dateTimeMsg, msg.toString());
-    			mManager.updatePeople(mManager.getLocalContactId(), People.STATE_YES, htmlMsg);
+    			String textMsg = UIUtils.getPlainString(event.title, dateTimeMsg, msg.toString());
+    			mManager.updatePeople(mManager.getLocalContactId(), People.STATE_YES, textMsg);
             	
             	setSelected(mYesButton);
             	setDeselected(mMaybeButton);
@@ -107,8 +107,8 @@ public class RsvpFragment extends Fragment {
     					false,
     	        		event.startDate.year, event.startDate.month, event.startDate.day,
     	        		event.startTime.hour, event.startTime.minute);
-    			String htmlMsg = UIUtils.getHtmlString(event.title, dateTimeMsg, msg.toString());
-    			mManager.updatePeople(mManager.getLocalContactId(), People.STATE_MAYBE, htmlMsg);
+    			String textMsg = UIUtils.getPlainString(event.title, dateTimeMsg, msg.toString());
+    			mManager.updatePeople(mManager.getLocalContactId(), People.STATE_MAYBE, textMsg);
     			
             	setDeselected(mYesButton);
             	setSelected(mMaybeButton);
@@ -126,8 +126,8 @@ public class RsvpFragment extends Fragment {
     					false,
     	        		event.startDate.year, event.startDate.month, event.startDate.day,
     	        		event.startTime.hour, event.startTime.minute);
-    			String htmlMsg = UIUtils.getHtmlString(event.title, dateTimeMsg, msg.toString());
-    			mManager.updatePeople(mManager.getLocalContactId(), People.STATE_NO, htmlMsg);
+    			String textMsg = UIUtils.getPlainString(event.title, dateTimeMsg, msg.toString());
+    			mManager.updatePeople(mManager.getLocalContactId(), People.STATE_NO, textMsg);
     			
             	setDeselected(mYesButton);
             	setDeselected(mMaybeButton);

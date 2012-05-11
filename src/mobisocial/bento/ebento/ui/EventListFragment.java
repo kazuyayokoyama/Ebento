@@ -69,7 +69,7 @@ public class EventListFragment extends ListFragment {
     @Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		EventListItem item = mManager.getEventListItem(position);
-		mManager.setDbFeed(item.feedUri);
+		mManager.setEventObjUri(item.objUri);
 		
 		// Intent
 		Intent intent = new Intent(getActivity(), EventActivity.class);

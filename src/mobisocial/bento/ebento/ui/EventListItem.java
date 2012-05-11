@@ -21,6 +21,13 @@ import android.net.Uri;
 
 
 public class EventListItem {
-	public Uri feedUri;
 	public Event event;
+	public Uri objUri;
+	public long feedId;
+	public boolean enabled;
+	
+	public EventListItem() {
+		event = new Event();
+		enabled = true;
+	}
 }
