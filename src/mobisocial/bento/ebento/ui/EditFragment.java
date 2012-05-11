@@ -18,6 +18,9 @@ package mobisocial.bento.ebento.ui;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -37,14 +40,17 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.MediaStore.MediaColumns;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItem;
 import android.util.Log;
@@ -66,6 +72,7 @@ import android.widget.Toast;
 public class EditFragment extends Fragment {
 	
 	private static final String TAG = "EditFragment";
+	private static final Boolean DEBUG = UIUtils.isDebugMode();
 
 	private static final int MAX_IMG_WIDTH_PHONE = 320;
 	private static final int MAX_IMG_HEIGHT_PHONE = 240;
@@ -430,17 +437,58 @@ public class EditFragment extends Fragment {
 	
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (DEBUG) Log.d(TAG, "requestCode: " + requestCode + ", resultCode: " + resultCode);
 		if (resultCode == Activity.RESULT_OK) {
 			try {
-				// uncomment below if you want to get small image
-				// Bitmap b = (Bitmap)data.getExtras().get("data");
-
-				File tmpFile = JpgFileHelper.getTmpFile();
-				if (tmpFile.exists() && tmpFile.length() > 0) {
+				File imageFile = null;
+				
+				if (requestCode == REQUEST_IMAGE_CAPTURE) {
+					
+					imageFile = JpgFileHelper.getTmpFile();
+					
+				} else if (requestCode == REQUEST_GALLERY) {
+					Uri uri = data.getData();
+					if (uri == null || uri.toString().length() == 0) {
+						return;
+					}
+					if (DEBUG) Log.d(TAG, "data URI: " + uri.toString());
+					
+					ContentResolver cr = getActivity().getContentResolver();
+					String[] columns = { MediaColumns.DATA, MediaColumns.DISPLAY_NAME };
+					Cursor c = cr.query(uri, columns, null, null, null);
+					
+					if (c != null && c.moveToFirst()) {
+						if (c.getString(0) != null) {
+							//regular processing for gallery files
+							imageFile = new File(c.getString(0));
+						} else {
+							final InputStream is = getActivity().getContentResolver().openInputStream(uri);
+							imageFile = JpgFileHelper.saveTmpFile(is);
+							is.close();
+						}
+					} else {
+						// http or https
+						HttpURLConnection http = null;
+						URL url = new URL(uri.toString());
+						http = (HttpURLConnection)url.openConnection();
+						http.setRequestMethod("GET");
+						http.connect();
+						
+						final InputStream is = http.getInputStream();
+						imageFile = JpgFileHelper.saveTmpFile(is);
+						is.close();
+						if (http != null) http.disconnect();
+					}
+				}
+				
+				if (imageFile.exists() && imageFile.length() > 0) {
+					if (DEBUG) Log.d(TAG, "imageFile exists=" + imageFile.exists()
+							+ " length=" + imageFile.length() + " path=" + imageFile.getPath());
+					
 					float degrees = 0;
 					try {
 						ExifInterface exif = new ExifInterface(
-								tmpFile.getPath());
+								imageFile.getPath());
 						switch (exif.getAttributeInt(
 								ExifInterface.TAG_ORIENTATION,
 								ExifInterface.ORIENTATION_NORMAL)) {
@@ -463,7 +511,7 @@ public class EditFragment extends Fragment {
 						e.printStackTrace();
 					}
 
-					sImageOrg = BitmapHelper.getResizedBitmap(tmpFile,
+					sImageOrg = BitmapHelper.getResizedBitmap(imageFile,
 							BitmapHelper.MAX_IMAGE_WIDTH,
 							BitmapHelper.MAX_IMAGE_HEIGHT, degrees);
 					mbImageChanged = true;
@@ -475,7 +523,8 @@ public class EditFragment extends Fragment {
 	            	mImageView.setVisibility(View.VISIBLE);
 	            	mRootView.invalidate();
 	            	
-					tmpFile.delete();
+					imageFile.delete();
+					JpgFileHelper.deleteTmpFile();
 				}
 
 			} catch (Exception e) {
@@ -622,11 +671,9 @@ public class EditFragment extends Fragment {
 	}
 
 	public void goGallery() {
-		File tmpFile = JpgFileHelper.getTmpFile();
 		Intent intent = new Intent();
 		intent.setType("image/*");
 		intent.setAction(Intent.ACTION_PICK);
-		intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(tmpFile));
 		startActivityForResult(intent, REQUEST_GALLERY);
 	}
 	
