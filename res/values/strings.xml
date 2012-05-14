@@ -98,6 +98,7 @@
     <string name="edit_event_add_cal_checkbox_sub">Calendar app will be opened when saved</string>
     <string name="edit_event_button_save">Save</string>
     <string name="edit_event_button_cancel">Cancel</string>
+    <string name="edit_event_saving">Saving</string>
     
     <!-- RSVP -->
     <string name="rsvp_title">RSVP now!</string>

@@ -38,6 +38,7 @@ import android.webkit.WebView;
 
 public class EventListActivity extends FragmentActivity {
 	//private static final String TAG = "EventListActivity";
+    private static final int REQUEST_CREATE_EVENT = 0;
     private static final int REQUEST_CREATE_FEED = 1;
     private static final String ACTION_CREATE_FEED = "musubi.intent.action.CREATE_FEED";
 
@@ -111,6 +112,15 @@ public class EventListActivity extends FragmentActivity {
                 
                 goCreate();
             }
+        } else if (requestCode == REQUEST_CREATE_EVENT) {
+            if (resultCode == RESULT_OK) {
+            	// setEventObjUri doesn't need here because it's already done when it's created internally.
+            	
+        		// Intent
+        		Intent intent = new Intent(this, EventActivity.class);
+        		intent.putExtra(EventActivity.EXTRA_LAUNCHED_FROM_LIST, true);
+        		startActivity(intent);
+            }
         }
     };
 
@@ -133,7 +143,7 @@ public class EventListActivity extends FragmentActivity {
     public void goCreate() {
 		// Intent
 		Intent intent = new Intent(this, EditActivity.class);
-		startActivity(intent);
+        startActivityForResult(intent, REQUEST_CREATE_EVENT);
     }
     
     private void goNewFeed() {

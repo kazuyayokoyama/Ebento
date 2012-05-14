@@ -39,6 +39,7 @@ import mobisocial.bento.ebento.util.UIUtils;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -106,6 +107,7 @@ public class EditFragment extends Fragment {
     private TextView mAddCalSub;
     private Button mSaveButton;
     private Button mCancelButton;
+	private ProgressDialog mProgressDialog = null;
     
     private EventManager mManager = EventManager.getInstance();
 	private boolean mbNewEventMode = true;
@@ -619,6 +621,12 @@ public class EditFragment extends Fragment {
 	        		event.startTime.hour, event.startTime.minute);
 			final String textMsg = UIUtils.getPlainString(event.title, dateTimeMsg, msg.toString());
 	
+			mProgressDialog = new ProgressDialog(getActivity());
+			mProgressDialog.setMessage(getActivity().getString(R.string.edit_event_saving));
+			mProgressDialog.setIndeterminate(true);
+			mProgressDialog.setCancelable(false);
+			mProgressDialog.show();
+			
 			// init event
 			final Event finEvent = event;
 			mManager.initEvent(event, textMsg, new OnInitialEventListener() {
@@ -633,6 +641,11 @@ public class EditFragment extends Fragment {
 					// Add to Cal
 					if (mAddCalCheckBox.isChecked()) {
 						CalendarHelper.addEventToCalendar(getActivity(), newEvent);
+					}
+
+					if (mProgressDialog != null && mProgressDialog.isShowing()) {
+						mProgressDialog.dismiss();
+						mProgressDialog = null;
 					}
 					
 					// back to home
