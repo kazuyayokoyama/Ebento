@@ -65,7 +65,7 @@ public class EventActivity extends FragmentActivity implements OnRsvpSelectedLis
         if (!mbLaunchedFromList) {
 			// create Musubi Instance
 	        InitialHelper initHelper = new InitialHelper(this, mInitCompleteListener);
-			Musubi musubi = initHelper.initMusubiInstance(true);
+			Musubi musubi = initHelper.initMusubiInstance(false);
 			if (musubi == null) {
 				return;
 			}

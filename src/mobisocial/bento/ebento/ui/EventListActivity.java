@@ -50,7 +50,7 @@ public class EventListActivity extends FragmentActivity {
 
 		// create Musubi Instance
         InitialHelper initHelper = new InitialHelper(this, mInitCompleteListener);
-		Musubi musubi = initHelper.initMusubiInstance(false);
+		Musubi musubi = initHelper.initMusubiInstance(true);
 		if (musubi == null) {
 			return;
 		}
