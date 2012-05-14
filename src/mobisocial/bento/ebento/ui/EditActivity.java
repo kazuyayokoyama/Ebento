@@ -49,8 +49,8 @@ public class EditActivity extends FragmentActivity {
 
 		final ActionBar actionBar = getSupportActionBar();
 		// set defaults for logo & home up
-		actionBar.setDisplayHomeAsUpEnabled(bNewEventMode ? false : true);
-		actionBar.setDisplayUseLogoEnabled(bNewEventMode ? false : true);
+		actionBar.setDisplayHomeAsUpEnabled(true);
+		actionBar.setDisplayUseLogoEnabled(true);
 		actionBar.setTitle(bNewEventMode ? R.string.label_create_event : R.string.label_edit_event);
     }
 

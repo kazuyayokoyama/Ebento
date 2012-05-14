@@ -5,9 +5,9 @@
     <string name="app_name">Ebento</string>
     <string name="label_event_list">Ebento</string>
     <string name="label_event">Ebento</string>
-    <string name="label_people_list">Ebento / Who\'s going?</string>
-    <string name="label_create_event">Ebento / Create Event</string>
-    <string name="label_edit_event">Ebento / Edit Event</string>
+    <string name="label_people_list">Who\'s going?</string>
+    <string name="label_create_event">Create Event</string>
+    <string name="label_edit_event">Edit Event</string>
     <string name="label_camera">Camera</string>
     <string name="label_gallery">Gallery</string>
     <string name="label_remove_picture">Remove</string>
